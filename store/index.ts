@@ -1,17 +1,20 @@
 import { Middleware, configureStore } from "@reduxjs/toolkit";
 import recipeApi from "@/api/recipeApi";
 import exchangeRatesApi from "@/api/currencyConversionApi";
+import restaurantsApi from "@/api/restaurantApi";
 
 
 const middleware = [
     recipeApi.middleware,
-    exchangeRatesApi.middleware
+    exchangeRatesApi.middleware,
+    restaurantsApi.middleware
 ] satisfies Middleware[]
 
 const store = configureStore({
     reducer: {
         [recipeApi.reducerPath]: recipeApi.reducer,
-        [exchangeRatesApi.reducerPath]: exchangeRatesApi.reducer
+        [exchangeRatesApi.reducerPath]: exchangeRatesApi.reducer,
+        [restaurantsApi.reducerPath]: restaurantsApi.reducer,
     },
     middleware: getDefaultMiddleware => getDefaultMiddleware().concat(middleware)
 })

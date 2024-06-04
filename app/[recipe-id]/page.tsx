@@ -11,6 +11,7 @@ import {
   Chip,
   Grid,
   Button,
+  Skeleton,
 } from "@mui/material";
 import Image from "next/image";
 import { useParams } from "next/navigation";
@@ -37,82 +38,115 @@ export default function RecipeDetail() {
   const router = useRouter();
 
   return (
-    <Container maxWidth="lg" sx={{ marginTop: 12 }}>
+    <Container maxWidth="lg" sx={{ marginTop: 4 }}>
       <Button sx={{ marginBottom: 3 }} onClick={router.back}>
         Back
       </Button>
       <Grid container spacing={6}>
-        <Grid item xs={6}>
+        <Grid item xs={12} lg={6}>
           <Stack direction="column">
-            <Image
-              style={{ borderRadius: 12, width: "100%" }}
-              width={536}
-              height={402}
-              src={data?.image || ""}
-              alt={data?.title || ""}
-            />
+            {isFetching ? (
+              <Skeleton
+                width={536}
+                height={402}
+                style={{ width: "100%" }}
+                variant="rounded"
+              />
+            ) : (
+              <Image
+                style={{ borderRadius: 12, width: "100%" }}
+                width={536}
+                height={402}
+                src={data?.image || ""}
+                alt={data?.title || ""}
+              />
+            )}
 
             <Box paddingY={4}>
-              <Typography variant="h5" fontWeight={600} gutterBottom>
-                {data?.title}
-              </Typography>
+              {isFetching ? (
+                <Skeleton width={350} height={40} variant="text" />
+              ) : (
+                <Typography variant="h5" fontWeight={600} gutterBottom>
+                  {data?.title}
+                </Typography>
+              )}
+
               <Stack direction={"row"} spacing={2}>
-                <Chip
-                  sx={{ fontSize: 16 }}
-                  label={`${
-                    data?.nutrition.nutrients.find((n) => n.name === "Calories")
-                      ?.amount
-                  } calories`}
-                />
-                <div
-                  style={{ display: "flex", gap: "6px", alignItems: "center" }}
-                >
-                  <svg
-                    data-id="12"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <polyline points="12 6 12 12 16 14"></polyline>
-                  </svg>
-                  <Typography>
-                    {data?.cookingMinutes ||
-                      data?.preparationMinutes ||
-                      data?.readyInMinutes ||
-                      0}{" "}
-                    mins
-                  </Typography>
-                </div>
+                {isFetching ? (
+                  <>
+                    <Skeleton variant="text" height={40} width={150} />
+                    <Skeleton variant="text" height={40} width={150} />
+                    <Skeleton variant="text" height={40} width={150} />
+                  </>
+                ) : (
+                  <>
+                    <Chip
+                      sx={{ fontSize: 16 }}
+                      label={`${
+                        data?.nutrition.nutrients.find(
+                          (n) => n.name === "Calories"
+                        )?.amount
+                      } calories`}
+                    />
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "6px",
+                        alignItems: "center",
+                      }}
+                    >
+                      <svg
+                        data-id="12"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
+                      <Typography>
+                        {data?.cookingMinutes ||
+                          data?.preparationMinutes ||
+                          data?.readyInMinutes ||
+                          0}{" "}
+                        mins
+                      </Typography>
+                    </div>
 
-                <div
-                  style={{ display: "flex", gap: "6px", alignItems: "center" }}
-                >
-                  <svg
-                    data-id="15"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path>
-                    <path d="M7 2v20"></path>
-                    <path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path>
-                  </svg>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "6px",
+                        alignItems: "center",
+                      }}
+                    >
+                      <svg
+                        data-id="15"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path>
+                        <path d="M7 2v20"></path>
+                        <path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path>
+                      </svg>
 
-                  <Typography>{data?.servings || 1} servings</Typography>
-                </div>
+                      <Typography>{data?.servings || 1} servings</Typography>
+                    </div>
+                  </>
+                )}
               </Stack>
 
               <Stack
@@ -121,73 +155,99 @@ export default function RecipeDetail() {
                 alignItems={"center"}
                 gap={1.5}
               >
-                <Typography variant="h5">
-                  {formatCurrency(data?.pricePerServing || 0, false)}
-                </Typography>
-                <Button
-                  variant="outlined"
-                  onClick={() => {
-                    toast.custom(
-                      () => (
-                        <Box
-                          padding={3}
-                          borderRadius={2}
-                          sx={{
-                            backgroundColor: "purple",
-                            color: "white",
-                            fontSize: 18,
-                          }}
-                        >
-                          {data?.title} costs {" "}
-                          {formatCurrency(
-                            dollarToNaira(data?.pricePerServing || 0),
-                            true
-                          )}
-                        </Box>
-                      ),
-                      {
-                        position: "top-center",
-                      }
-                    );
-                  }}
-                >
-                  Click to see price in Naira
-                </Button>
+                {isLoading ? (
+                  <>
+                    <Skeleton variant="text" height={56} width={100} />
+                    <Skeleton variant="text" height={56} width={200} />
+                  </>
+                ) : (
+                  <>
+                    <Typography variant="h5">
+                      {formatCurrency(data?.pricePerServing || 0, false)}
+                    </Typography>
+                    <Button
+                      variant="outlined"
+                      onClick={() => {
+                        toast.custom(
+                          () => (
+                            <Box
+                              padding={3}
+                              borderRadius={2}
+                              sx={{
+                                backgroundColor: "purple",
+                                color: "white",
+                                fontSize: 18,
+                              }}
+                            >
+                              {data?.title} costs{" "}
+                              {formatCurrency(
+                                dollarToNaira(data?.pricePerServing || 0),
+                                true
+                              )}
+                            </Box>
+                          ),
+                          {
+                            position: "top-center",
+                          }
+                        );
+                      }}
+                    >
+                      Click to see price in Naira
+                    </Button>
+                  </>
+                )}
               </Stack>
 
-              <Typography lineHeight={1.8} marginTop={3}>
-                <span
-                  dangerouslySetInnerHTML={{ __html: data?.summary || "" }}
-                ></span>
-              </Typography>
+              {isLoading ? (
+                <Skeleton height={500} width={"100%"} variant="text" />
+              ) : (
+                <Typography lineHeight={1.8} marginTop={3}>
+                  <span
+                    dangerouslySetInnerHTML={{ __html: data?.summary || "" }}
+                  ></span>
+                </Typography>
+              )}
             </Box>
           </Stack>
         </Grid>
 
-        <Grid item xs={6}>
+        <Grid item xs={12} lg={6}>
           <Typography variant="h6" gutterBottom>
             Ingredients
           </Typography>
 
-          <ol style={{ marginBottom: 20 }}>
-            {data?.extendedIngredients.map((ing) => (
-              <li key={ing.original}>
-                <Typography component={"span"} lineHeight={1.8}>
-                  {ing.original}
-                </Typography>
-              </li>
-            ))}
-          </ol>
+          {isLoading ? (
+            <Skeleton
+              variant="rounded"
+              height={200}
+              style={{ marginBottom: 20 }}
+              width={"100%"}
+            />
+          ) : (
+            <ol style={{ marginBottom: 20 }}>
+              {data?.extendedIngredients.map((ing) => (
+                <li key={ing.original}>
+                  <Typography component={"span"} lineHeight={1.8}>
+                    {ing.original}
+                  </Typography>
+                </li>
+              ))}
+            </ol>
+          )}
 
           <Typography variant="h6" gutterBottom>
             Instructions
           </Typography>
 
-          <Typography lineHeight={1.8}>
-            <div
-              dangerouslySetInnerHTML={{ __html: data?.instructions || "" }}
-            />
-          </Typography>
+          {isLoading ? (
+            <Skeleton variant="rounded" height={200} width={"100%"} />
+          ) : (
+            <Typography lineHeight={1.8}>
+              <div
+                dangerouslySetInnerHTML={{ __html: data?.instructions || "" }}
+              />
+            </Typography>
+          )}
         </Grid>
       </Grid>
     </Container>
