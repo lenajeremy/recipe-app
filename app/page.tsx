@@ -1,95 +1,85 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+
+import * as React from "react";
+import {
+  Stack,
+  TextField,
+  Grid,
+  Box,
+  Typography,
+  Card,
+  Button,
+} from "@mui/material";
+import Recipe from "@/components/recipe-card";
+import { useLazySearchRecipeQuery } from "@/api/recipeApi";
+import { SubmitHandler, useForm } from "react-hook-form";
+
+
 
 export default function Home() {
+  const { register, handleSubmit } = useForm<{ searchQuery: string }>();
+  const [getRecipes, { data, isFetching }] = useLazySearchRecipeQuery();
+
+  React.useEffect(() => {
+  getRecipes("");
+  }, []);
+
+  const handleSearchRecipe: SubmitHandler<{ searchQuery: string }> =
+    React.useCallback(async (values) => {
+      try {
+        const res = await getRecipes(values.searchQuery).unwrap();
+        console.log(res);
+      } catch (error) {
+        console.error(error);
+      }
+    }, []);
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+    <main>
+      <Box padding={2}>
+        <Card variant="outlined">
+          <Stack padding={3}>
+            <Typography sx={{ fontSize: 30, fontWeight: 600 }} component={"h1"}>
+              Recipe Search
+            </Typography>
+            <Typography variant="subtitle1" color={"GrayText"} marginBottom={3}>
+              Find delicious and healthy recipes.
+            </Typography>
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+            <form onSubmit={handleSubmit(handleSearchRecipe)}>
+              <Stack direction={"row"} gap={1}>
+                <TextField
+                  {...register("searchQuery", { required: true })}
+                  sx={{ flex: 1 }}
+                  label="Search recipes..."
+                  placeholder="e.g. nigerian jollof rice"
+                  variant="filled"
+                />
+                <Button sx={{ paddingX: 4 }} variant="contained">
+                  Search
+                </Button>
+              </Stack>
+            </form>
+          </Stack>
 
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+          <Grid container spacing={3} padding={3}>
+            {isFetching
+              ? Array.from({ length: 10 }).map((_, i) => (
+                  <Grid item xs={12} sm = {6} md = {4} lg = {3} xl = {2.4} key={i}>
+                    <Recipe loading />
+                  </Grid>
+                ))
+              : data?.map((recipe) => (
+                  <Grid item xs={12} sm = {6} md = {4} lg = {3} xl = {2.4} key={recipe.id}>
+                    <Recipe
+                      recipe={recipe}
+                      loading={isFetching}
+                    />
+                  </Grid>
+                ))}
+          </Grid>
+        </Card>
+      </Box>
     </main>
   );
 }
